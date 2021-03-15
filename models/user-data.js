@@ -5,16 +5,7 @@ const userSchema = mongoose.Schema({
     lastName : { type : String, required : true },
     email : { type : String, required : true },
     password : { type : String, required : true },
-    id : { type : String },
-
-    followers : Number,
-    following : Number,
-    stockInterests : [String],
-
-    createdAt : {
-        type : Date,
-        default : new Date()
-    }
+    id : { type : String }
 });
 
 export default mongoose.model('userData', userSchema);

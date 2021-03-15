@@ -7,11 +7,13 @@ export const login = async (req, res) => {
 
     try {
         const existingUser = await userData.findOne({ email });
-        const isPassCorrect = await bcrypt.compare(password, existingUser.password);
 
         if(!existingUser) {
             return res.status(404).json({ message : "User doesn't exist" });
         }
+
+        const isPassCorrect = await bcrypt.compare(password, existingUser.password);
+
         if (!isPassCorrect) {
             return res.status(400).json({ message : "Incorrect Credentials!" });
         }
@@ -23,7 +25,7 @@ export const login = async (req, res) => {
     catch(error) {
         res.status(500).json({ message : "Oops! something went wrong" });
     }
-}
+};
 
 export const register = async (req, res) => {
     const {email, password, rePassword, firstName, lastName} = req.body;
@@ -51,4 +53,4 @@ export const register = async (req, res) => {
     catch(error) {
         res.status(500).json({ message : "Oops! something went wrong" });
     }
-}
+};
