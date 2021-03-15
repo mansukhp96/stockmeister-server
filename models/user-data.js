@@ -5,7 +5,9 @@ const userSchema = mongoose.Schema({
     lastName : { type : String, required : true },
     email : { type : String, required : true },
     password : { type : String, required : true },
-    id : { type : String }
+    id : { type : String },
+    followers : { type : Number },
+    following : { type : Number }
 });
 
 export default mongoose.model('userData', userSchema);

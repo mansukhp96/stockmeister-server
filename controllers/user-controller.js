@@ -28,7 +28,7 @@ export const login = async (req, res) => {
 };
 
 export const register = async (req, res) => {
-    const {email, password, rePassword, firstName, lastName} = req.body;
+    const {email, password, rePassword, firstName, lastName, followers, following} = req.body;
 
     try{
         const existingUser = await userData.findOne({ email });
@@ -43,7 +43,7 @@ export const register = async (req, res) => {
         const hashPass = await bcrypt.hash(password, 12);
 
         const result = await userData.create({
-            email, password : hashPass, firstName, lastName
+            email, password : hashPass, firstName, lastName, followers, following
         });
 
         //TODO env variables when moving to prod - secret
