@@ -1,8 +1,12 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import userData from "../models/user-data.js";
+import OAuth2Client from 'google-auth-library';
+
+const client = new OAuth2Client.OAuth2Client("773832370247-e8m7hoo3qe1ba9vu590rfhjm67f0itps.apps.googleusercontent.com");
 
 export const login = async (req, res) => {
+
     const { email, password } = req.body;
 
     try {
@@ -24,6 +28,60 @@ export const login = async (req, res) => {
     }
     catch(error) {
         res.status(500).json({ message : "Oops! something went wrong" });
+    }
+};
+
+export const gglLogin = async (req, res) => {
+    const { token } = req.body;
+
+    try {
+        //Verify if token is legit
+        client.verifyIdToken({
+            idToken: token,
+            audience: "773832370247-e8m7hoo3qe1ba9vu590rfhjm67f0itps.apps.googleusercontent.com"
+        })
+            .then((response) => {
+                const {email_verified, given_name, family_name, email} = response.payload;
+
+                if (email_verified) {
+                    userData.findOne({email}).exec((error, user) => {
+                        if (error) {
+                            return res.status(400).json({message: "Oops! something went wrong!"})
+                        } else {
+                            //Verify if user exists
+                            if (user) {
+                                const dbToken = jwt.sign({email: user.email, id: user._id}, 'test', {expiresIn: "1h"});
+                                res.status(200).json({result: user, dbToken});
+                            }
+                            //Create user if user doesn't exist
+                            else {
+                                let result = new userData({
+                                    email : email,
+                                    password: email+token,
+                                    firstName: given_name,
+                                    lastName: family_name,
+                                    followers: 0,
+                                    following: 0
+                                });
+                                result.save((error, data) => {
+                                    if (error) {
+                                        return res.status(400).json({message: "Oops! something went wrong!!"})
+                                    }
+                                    const dbToken = jwt.sign({
+                                        email: data.email,
+                                        id: data._id
+                                    }, 'test', {expiresIn: "1h"});
+                                    const { email, firstName, lastname } = result;
+                                    res.status(200).json({result, token : dbToken});
+                                });
+                            }
+                        }
+                    })
+                }
+            })
+    }
+    catch(error) {
+        res.status(500).json({ message : "Oops! something went wrong!!!" });
     }
 };
 
