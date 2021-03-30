@@ -11,5 +11,7 @@ possible to real life results. Sign up today and become a stock meister!
 
 
 Project description [P1] document link:
-
 https://docs.google.com/document/d/1GPqFNDUEkzjtc5RssrisoY-o9yfRtg9892cfm1_DiQY/edit?usp=sharing
+
+Project prototype [P2] document link:
+https://docs.google.com/document/d/1YDYooGj6iCC5xw5CiWuOHhJdbNElfI3q9iTLjIUF-6k/edit
