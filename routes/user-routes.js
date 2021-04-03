@@ -1,10 +1,8 @@
 import express from "express";
-import {register, login, gglLogin} from '../controllers/user-controller.js'
+import {findAllUsers} from '../controllers/user-controller.js'
 
 const router = express.Router();
 
-router.post("/login", login);
-router.post("/register", register);
-router.post("/google-login", gglLogin);
+router.get("/all", findAllUsers);
 
 export default router;
