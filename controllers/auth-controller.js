@@ -60,8 +60,13 @@ export const gglLogin = async (req, res) => {
                                     password: email+token,
                                     firstName: given_name,
                                     lastName: family_name,
-                                    followers: 0,
-                                    following: 0
+                                    joinedOn : Date.now(),
+                                    interests : [],
+                                    phoneNumber : null,
+                                    address : null,
+                                    bankAccount : null,
+                                    followers: [],
+                                    following: []
                                 });
                                 result.save((error, data) => {
                                     if (error) {
@@ -101,7 +106,17 @@ export const register = async (req, res) => {
         const hashPass = await bcrypt.hash(password, 12);
 
         const result = await userData.create({
-            email, password : hashPass, firstName, lastName, followers, following
+            email,
+            password : hashPass,
+            firstName,
+            lastName,
+            joinedOn : Date.now(),
+            interests : [],
+            phoneNumber : null,
+            address : null,
+            bankAccount : null,
+            followers : [],
+            following : []
         });
 
         //TODO env variables when moving to prod - secret

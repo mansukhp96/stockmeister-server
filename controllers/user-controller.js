@@ -12,6 +12,12 @@ export const findAllUsers = async (req, res) => {
                             return {
                                 _id : r._id,
                                 email : r.email,
+                                username : r.email.substring(0, r.email.lastIndexOf("@")),
+                                joined_on : r.joinedOn,
+                                interests : r.interests,
+                                phone_number : r.phoneNumber,
+                                address : r.address,
+                                bank_account : r.bankAccount,
                                 first_name : r.firstName,
                                 last_name : r.lastName,
                                 followers : r.followers,

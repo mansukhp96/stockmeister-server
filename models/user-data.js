@@ -1,13 +1,18 @@
 import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema({
+    id : { type : String },
     firstName : { type : String, required : true },
     lastName : { type : String, required : true },
     email : { type : String, required : true },
     password : { type : String, required : true },
-    id : { type : String },
-    followers : { type : Number },
-    following : { type : Number }
+    joinedOn : { type : Date },
+    interests : { type : Array },
+    phoneNumber : { type : Number },
+    address : { type : String },
+    bankAccount : { type : String },
+    followers : { type : Array },
+    following : { type : Array }
 });
 
 export default mongoose.model('userData', userSchema);
