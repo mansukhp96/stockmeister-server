@@ -8,6 +8,7 @@ const userSchema = mongoose.Schema({
     email : { type : String, required : true },
     password : { type : String, required : true },
     joinedOn : { type : Date },
+    imageUrl : { type : String },
     interests : { type : Array },
     phoneNumber : { type : Number },
     address : { type : String },

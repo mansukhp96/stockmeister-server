@@ -41,15 +41,52 @@ export const getUserInfo = async (req, res) => {
             res.send({
                 _id : user._id,
                 email : user.email,
+                username : user.email.substring(0, user.email.lastIndexOf("@")),
                 first_name : user.firstName,
                 last_name : user.lastName,
                 joined_on : user.joinedOn,
                 gender : user.gender,
+                address : user.address,
+                phone_number : user.phoneNumber,
                 interests : user.interests,
                 following : user.following,
                 followers : user.followers
             })
         }
+    }
+    catch(error) {
+        res.status(500).json({ message : "Something went wrong!" });
+    }
+}
+
+export const updateUser = async (req, res) => {
+
+    const { _id, gender, phoneNumber, address, bankAccount } = req.body;
+
+    const updatedUser = new userData({
+        _id : _id,
+        gender : gender,
+        phoneNumber : phoneNumber,
+        address : address,
+        bankAccount : bankAccount
+    });
+
+    try {
+       await userData.updateOne({_id}, updatedUser, (err, result) => {
+            if(result) {
+                userData.findOne({_id}).exec((error, usr) => {
+                    if (error) {
+                        return res.status(400).json({message: "Oops! something went wrong!"})
+                    }
+                    else {
+                        res.status(200).json({result: usr});
+                    }
+                })
+            }
+            else {
+                res.status(404).json({message: "User update failed"});
+            }
+        });
     }
     catch(error) {
         res.status(500).json({ message : "Something went wrong!" });

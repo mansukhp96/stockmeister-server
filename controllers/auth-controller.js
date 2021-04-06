@@ -41,7 +41,7 @@ export const gglLogin = async (req, res) => {
             audience: "773832370247-e8m7hoo3qe1ba9vu590rfhjm67f0itps.apps.googleusercontent.com"
         })
             .then((response) => {
-                const {email_verified, given_name, family_name, email} = response.payload;
+                const {email_verified, given_name, family_name, email, picture} = response.payload;
 
                 if (email_verified) {
                     userData.findOne({email}).exec((error, user) => {
@@ -61,6 +61,7 @@ export const gglLogin = async (req, res) => {
                                     firstName: given_name,
                                     lastName: family_name,
                                     gender: null,
+                                    imageUrl : picture,
                                     joinedOn : Date.now(),
                                     interests : [],
                                     phoneNumber : null,
@@ -114,6 +115,7 @@ export const register = async (req, res) => {
             joinedOn : Date.now(),
             interests : [],
             gender : null,
+            imageUrl : null,
             phoneNumber : null,
             address : null,
             bankAccount : null,
