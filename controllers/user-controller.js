@@ -61,14 +61,15 @@ export const getUserInfo = async (req, res) => {
 
 export const updateUser = async (req, res) => {
 
-    const { _id, gender, phoneNumber, address, bankAccount } = req.body;
+    const { _id, gender, phoneNumber, address, bankAccount, interests } = req.body;
 
     const updatedUser = new userData({
         _id : _id,
         gender : gender,
         phoneNumber : phoneNumber,
         address : address,
-        bankAccount : bankAccount
+        bankAccount : bankAccount,
+        interests : interests
     });
 
     try {
@@ -76,7 +77,7 @@ export const updateUser = async (req, res) => {
             if(result) {
                 userData.findOne({_id}).exec((error, usr) => {
                     if (error) {
-                        return res.status(400).json({message: "Oops! something went wrong!"})
+                        return res.status(400).json({message: "Oops! something went wrong!"});
                     }
                     else {
                         res.status(200).json({result: usr});
@@ -87,6 +88,24 @@ export const updateUser = async (req, res) => {
                 res.status(404).json({message: "User update failed"});
             }
         });
+    }
+    catch(error) {
+        res.status(500).json({ message : "Something went wrong!" });
+    }
+};
+
+export const deleteUser = async (req, res) => {
+    const _id = req.params.id;
+
+    try {
+        await userData.deleteOne({ _id }).exec((error, result) => {
+            if(error) {
+                return res.status(400).json({message: "Oops! something went wrong!"});
+            }
+            else {
+                res.status(200).json({ message : "User account deleted" });
+            }
+        })
     }
     catch(error) {
         res.status(500).json({ message : "Something went wrong!" });
