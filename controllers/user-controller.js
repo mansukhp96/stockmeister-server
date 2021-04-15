@@ -61,7 +61,7 @@ export const getUserInfo = async (req, res) => {
 
 export const updateUser = async (req, res) => {
 
-    const { _id, gender, phoneNumber, address, bankAccount, interests } = req.body;
+    const { _id, gender, phoneNumber, address, bankAccount, interests, following, followers } = req.body;
 
     const updatedUser = new userData({
         _id : _id,
@@ -69,7 +69,9 @@ export const updateUser = async (req, res) => {
         phoneNumber : phoneNumber,
         address : address,
         bankAccount : bankAccount,
-        interests : interests
+        interests : interests,
+        following : following,
+        followers : followers
     });
 
     try {
@@ -93,6 +95,52 @@ export const updateUser = async (req, res) => {
         res.status(500).json({ message : "Something went wrong!" });
     }
 };
+
+export const updateFollowing = async (req, res) => {
+    const { _id } = req.body;
+    const myId = req.params.id;
+
+    const user = await userData.findById(myId);
+    const updatedUser = userData.updateOne(
+        {_id : myId}, { following : [ ...user.following , _id ] }, {new : true}, (err, result) => {
+            if(result) {
+                userData.findOne({_id : myId}).exec((error, usr) => {
+                    if (error) {
+                        return res.status(400).json({message: "Oops! something went wrong!"});
+                    }
+                    else {
+                        res.status(200).json({result: usr});
+                    }
+                })
+            }
+            else {
+                res.status(404).json({message: "User update failed"});
+            }
+        });
+};
+
+export const updateFollower = async (req, res) => {
+    const { _id } = req.body;
+    const otherId = req.params.id;
+
+    const otherUser = await userData.findById(otherId);
+    const updatedOtherUser = userData.updateOne(
+        {_id : otherId}, { followers : [ ...otherUser.followers , _id ] }, {new : true}, (err, result) => {
+            if(result) {
+                userData.findOne({_id : otherUser}).exec((error, usr) => {
+                    if (error) {
+                        return res.status(400).json({message: "Oops! something went wrong!"});
+                    }
+                    else {
+                        res.status(200);
+                    }
+                })
+            }
+            else {
+                res.status(404).json({message: "User update failed"});
+            }
+        });
+}
 
 export const deleteUser = async (req, res) => {
     const _id = req.params.id;
