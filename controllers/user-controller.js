@@ -11,6 +11,7 @@ export const findAllUsers = async (req, res) => {
                     res.send({ result : result.map((r,i) => {
                             return {
                                 _id : r._id,
+                                accountType : r.accountType,
                                 username : r.email.substring(0, r.email.lastIndexOf("@")),
                                 joined_on : r.joinedOn,
                                 gender : r.gender,
@@ -41,6 +42,7 @@ export const getUserInfo = async (req, res) => {
             res.send({
                 _id : user._id,
                 email : user.email,
+                accountType : user.accountType,
                 username : user.email.substring(0, user.email.lastIndexOf("@")),
                 first_name : user.firstName,
                 last_name : user.lastName,
@@ -80,6 +82,36 @@ export const getUserFollowers = async (req, res) => {
                             r.email.substring(0,r.email.lastIndexOf("@"))
                         ));
                         res.status(200).json(userFollowersUnames);
+                    }
+                })
+        }
+    }
+    catch (error) {
+        return res.status(400).json({message: "Oops! something went wrong!"});
+    }
+};
+
+export const getUserFollowing = async (req, res) => {
+    const _id = req.params.id;
+    let userFollowingUnames = [];
+
+    try {
+        const user = await userData.findOne({_id});
+        if(!user) {
+            return res.status(404).json({message: "User doesn't exist"});
+        }
+        else {
+            const userFollowingIds = user.following;
+            userData.find({ _id : { $in : userFollowingIds } })
+                .exec((error, resp) => {
+                    if(error) {
+                        return res.status(400).json({message: "Oops! something went wrong!"});
+                    }
+                    else {
+                        resp.map(r => userFollowingUnames.push(
+                            r.email.substring(0,r.email.lastIndexOf("@"))
+                        ));
+                        res.status(200).json(userFollowingUnames);
                     }
                 })
         }

@@ -32,7 +32,8 @@ export const login = async (req, res) => {
 };
 
 export const gglLogin = async (req, res) => {
-    const { token } = req.body;
+    const { token, accountType } = req.body;
+    console.log(accountType);
 
     try {
         //Verify if token is legit
@@ -57,6 +58,7 @@ export const gglLogin = async (req, res) => {
                             else {
                                 let result = new userData({
                                     email : email,
+                                    accountType : accountType,
                                     password: email+token,
                                     firstName: given_name,
                                     lastName: family_name,

@@ -8,7 +8,8 @@ import {
     updateFollower,
     removeFollowing,
     removeFollower,
-    getUserFollowers
+    getUserFollowers,
+    getUserFollowing
 } from '../controllers/user-controller.js'
 
 const router = express.Router();
@@ -16,6 +17,7 @@ const router = express.Router();
 router.get("/all", findAllUsers);
 router.get("/info/:id", getUserInfo);
 router.get("/:id/followers", getUserFollowers);
+router.get("/:id/following", getUserFollowing);
 router.post('/update/:id', updateUser);
 router.post('/delete/:id', deleteUser);
 router.post('/updateFollowing/:id', updateFollowing);

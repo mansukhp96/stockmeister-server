@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const userSchema = mongoose.Schema({
+const managerSchema = mongoose.Schema({
     id : { type : String },
     accountType : { type : String },
     firstName : { type : String, required : true },
@@ -13,9 +13,7 @@ const userSchema = mongoose.Schema({
     interests : { type : Array },
     phoneNumber : { type : Number },
     address : { type : String },
-    bankAccount : { type : String },
-    followers : { type : Array },
-    following : { type : Array }
+    clients : { type : Array }
 });
 
-export default mongoose.model('userData', userSchema);
+export default mongoose.model('managerData', managerSchema);
