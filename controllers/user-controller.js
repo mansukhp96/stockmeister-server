@@ -57,7 +57,37 @@ export const getUserInfo = async (req, res) => {
     catch(error) {
         res.status(500).json({ message : "Something went wrong!" });
     }
-}
+};
+
+export const getUserFollowers = async (req, res) => {
+    const _id = req.params.id;
+    let userFollowersUnames = [];
+
+    try {
+        const user = await userData.findOne({_id});
+        if(!user) {
+            return res.status(404).json({message: "User doesn't exist"});
+        }
+        else {
+            const userFollowersIds = user.followers;
+            userData.find({ _id : { $in : userFollowersIds } })
+                .exec((error, resp) => {
+                    if(error) {
+                        return res.status(400).json({message: "Oops! something went wrong!"});
+                    }
+                    else {
+                        resp.map(r => userFollowersUnames.push(
+                            r.email.substring(0,r.email.lastIndexOf("@"))
+                        ));
+                        res.status(200).json(userFollowersUnames);
+                    }
+                })
+        }
+    }
+    catch (error) {
+        return res.status(400).json({message: "Oops! something went wrong!"});
+    }
+};
 
 export const updateUser = async (req, res) => {
 

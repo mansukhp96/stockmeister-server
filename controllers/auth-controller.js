@@ -46,7 +46,7 @@ export const gglLogin = async (req, res) => {
                 if (email_verified) {
                     userData.findOne({email}).exec((error, user) => {
                         if (error) {
-                            return res.status(400).json({message: "Oops! something went wrong!"})
+                            return res.status(400).json({message: "Oops! something went wrong!"});
                         } else {
                             //Verify if user exists
                             if (user) {
