@@ -5,7 +5,7 @@ const managerSchema = mongoose.Schema({
     accountType : { type : String },
     firstName : { type : String, required : true },
     lastName : { type : String, required : true },
-    gender : { type : String },
+    experience : { type : Number },
     email : { type : String, required : true },
     password : { type : String, required : true },
     joinedOn : { type : Date },

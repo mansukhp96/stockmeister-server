@@ -1,29 +1,31 @@
 import userData from "../models/user-data.js";
+import managerData from "../models/manager-data.js";
 
 export const findAllUsers = async (req, res) => {
+
+    let allOfThem = [];
+
     try {
-        const allUsers = await userData.find(
-            {}, (error, result) => {
-                if(error) {
-                    return null;
-                }
-                else if (result){
-                    res.send({ result : result.map((r,i) => {
-                            return {
-                                _id : r._id,
-                                accountType : r.accountType,
-                                username : r.email.substring(0, r.email.lastIndexOf("@")),
-                                joined_on : r.joinedOn,
-                                gender : r.gender,
-                                first_name : r.firstName,
-                                last_name : r.lastName,
-                                followers : r.followers,
-                                following : r.following
-                            }
-                        })
-                    });
-                }
+        const allUsers = await userData.find({});
+            allOfThem.push(...allUsers);
+        const allManagers = await managerData.find({});
+            allOfThem.push( ...allManagers );
+
+        res.send({ result : allOfThem.map((r,i) => {
+            return {
+                _id : r._id,
+                accountType : r.accountType,
+                username : r.email.substring(0, r.email.lastIndexOf("@")),
+                joined_on : r.joinedOn,
+                gender : r.gender,
+                first_name : r.firstName,
+                last_name : r.lastName,
+                followers : r.followers,
+                following : r.following,
+                clients : r.clients
+            }
             })
+        })
     }
     catch(error) {
         res.status(500).json({ message : "Something went wrong!" });
@@ -36,9 +38,31 @@ export const getUserInfo = async (req, res) => {
 
     try {
         const user = await userData.findOne({ _id });
+        let manager = {};
+
         if (!user) {
-            return res.status(404).json({message: "User doesn't exist"});
-        } else {
+            manager = await managerData.findOne({ _id });
+            if(!manager) {
+                return res.status(404).json({message: "User doesn't exist"});
+            }
+            else {
+                res.send({
+                    _id : manager._id,
+                    email : manager.email,
+                    accountType : manager.accountType,
+                    username : manager.email.substring(0, manager.email.lastIndexOf("@")),
+                    first_name : manager.firstName,
+                    last_name : manager.lastName,
+                    joined_on : manager.joinedOn,
+                    experience : manager.experience,
+                    address : manager.address,
+                    phone_number : manager.phoneNumber,
+                    interests : manager.interests,
+                    clients : manager.clients
+                })
+            }
+        }
+        else {
             res.send({
                 _id : user._id,
                 email : user.email,
