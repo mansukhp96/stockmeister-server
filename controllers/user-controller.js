@@ -147,7 +147,7 @@ export const getUserFollowing = async (req, res) => {
 
 export const updateUser = async (req, res) => {
 
-    const { _id, gender, phoneNumber, address, bankAccount, interests, following, followers } = req.body;
+    const { _id, accountType, gender, phoneNumber, address, bankAccount, interests, following, followers, clients, experience } = req.body;
 
     const updatedUser = new userData({
         _id : _id,
@@ -160,22 +160,51 @@ export const updateUser = async (req, res) => {
         followers : followers
     });
 
+    const updatedManager = new managerData({
+        _id : _id,
+        gender : gender,
+        phoneNumber : phoneNumber,
+        address : address,
+        experience : experience,
+        interests : interests,
+        clients : clients
+    });
+
     try {
-       await userData.updateOne({_id}, updatedUser, (err, result) => {
-            if(result) {
-                userData.findOne({_id}).exec((error, usr) => {
-                    if (error) {
-                        return res.status(400).json({message: "Oops! something went wrong!"});
-                    }
-                    else {
-                        res.status(200).json({result: usr});
-                    }
-                })
-            }
-            else {
-                res.status(404).json({message: "User update failed"});
-            }
-        });
+       if(accountType === "trader") {
+           await userData.updateOne({_id}, updatedUser, (err, result) => {
+               if(result) {
+                   userData.findOne({_id}).exec((error, usr) => {
+                       if (error) {
+                           return res.status(400).json({message: "Oops! something went wrong!"});
+                       }
+                       else {
+                           res.status(200).json({result: usr});
+                       }
+                   })
+               }
+               else {
+                   res.status(404).json({message: "User update failed"});
+               }
+           });
+       }
+       else {
+           await managerData.updateOne({_id}, updatedManager, (err, result) => {
+               if(result) {
+                   managerData.findOne({_id}).exec((error, usr) => {
+                       if (error) {
+                           return res.status(400).json({message: "Oops! something went wrong!"});
+                       }
+                       else {
+                           res.status(200).json({result: usr});
+                       }
+                   })
+               }
+               else {
+                   res.status(404).json({message: "User update failed"});
+               }
+           });
+       }
     }
     catch(error) {
         res.status(500).json({ message : "Something went wrong!" });
@@ -276,16 +305,29 @@ export const removeFollower = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
     const _id = req.params.id;
+    const { account } = req.body;
 
     try {
-        await userData.deleteOne({ _id }).exec((error, result) => {
-            if(error) {
-                return res.status(400).json({message: "Oops! something went wrong!"});
-            }
-            else {
-                res.status(200).json({ message : "User account deleted" });
-            }
-        })
+        if(account === "trader") {
+            await userData.deleteOne({ _id }).exec((error, result) => {
+                if(error) {
+                    return res.status(400).json({message: "Oops! something went wrong!"});
+                }
+                else {
+                    res.status(200).json({ message : "User account deleted" });
+                }
+            })
+        }
+        else {
+            await managerData.deleteOne({ _id }).exec((error, result) => {
+                if(error) {
+                    return res.status(400).json({message: "Oops! something went wrong!"});
+                }
+                else {
+                    res.status(200).json({ message : "User account deleted" });
+                }
+            })
+        }
     }
     catch(error) {
         res.status(500).json({ message : "Something went wrong!" });
