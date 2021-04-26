@@ -15,7 +15,8 @@ const userSchema = mongoose.Schema({
     address : { type : String },
     bankAccount : { type : String },
     followers : { type : Array },
-    following : { type : Array }
+    following : { type : Array },
+    manager : {type : String}
 });
 
 export default mongoose.model('userData', userSchema);

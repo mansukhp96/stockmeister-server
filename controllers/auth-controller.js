@@ -74,7 +74,8 @@ export const gglLogin = async (req, res) => {
                                         address : null,
                                         bankAccount : null,
                                         followers: [],
-                                        following: []
+                                        following: [],
+                                        manager : null
                                     });
                                     result.save((error, data) => {
                                         if (error) {
@@ -178,7 +179,8 @@ export const register = async (req, res) => {
                 address : null,
                 bankAccount : null,
                 followers : [],
-                following : []
+                following : [],
+                manager : null
             });
             //TODO env variables when moving to prod - secret
             const token = jwt.sign( { email : result.email, id : result._id }, 'test', {expiresIn: "1h"});

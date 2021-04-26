@@ -22,7 +22,8 @@ export const findAllUsers = async (req, res) => {
                 last_name : r.lastName,
                 followers : r.followers,
                 following : r.following,
-                clients : r.clients
+                clients : r.clients,
+                manager : r.manager
             }
             })
         })
@@ -76,7 +77,8 @@ export const getUserInfo = async (req, res) => {
                 phone_number : user.phoneNumber,
                 interests : user.interests,
                 following : user.following,
-                followers : user.followers
+                followers : user.followers,
+                manager : user.manager
             })
         }
     }
@@ -102,10 +104,40 @@ export const getUserFollowers = async (req, res) => {
                         return res.status(400).json({message: "Oops! something went wrong!"});
                     }
                     else {
-                        resp.map(r => userFollowersUnames.push(
+                        resp.map(r => userFollowersUnames.unshift(
                             r.email.substring(0,r.email.lastIndexOf("@"))
                         ));
                         res.status(200).json(userFollowersUnames);
+                    }
+                })
+        }
+    }
+    catch (error) {
+        return res.status(400).json({message: "Oops! something went wrong!"});
+    }
+};
+
+export const getManagerClients = async (req, res) => {
+    const _id = req.params.id;
+    let managerClientUnames = [];
+
+    try {
+        const manager = await managerData.findOne({ _id });
+        if(!manager) {
+            return res.status(404).json({message: "User doesn't exist"});
+        }
+        else {
+            const managerClientIds = manager.clients;
+            userData.find({ _id : { $in : managerClientIds } })
+                .exec((error, resp) => {
+                    if(error) {
+                        return res.status(400).json({message: "Oops! something went wrong!"});
+                    }
+                    else {
+                        resp.map(r => managerClientUnames.unshift(
+                            r.email.substring(0,r.email.lastIndexOf("@"))
+                        ));
+                        res.status(200).json(managerClientUnames);
                     }
                 })
         }
@@ -132,7 +164,7 @@ export const getUserFollowing = async (req, res) => {
                         return res.status(400).json({message: "Oops! something went wrong!"});
                     }
                     else {
-                        resp.map(r => userFollowingUnames.push(
+                        resp.map(r => userFollowingUnames.unshift(
                             r.email.substring(0,r.email.lastIndexOf("@"))
                         ));
                         res.status(200).json(userFollowingUnames);
@@ -147,7 +179,7 @@ export const getUserFollowing = async (req, res) => {
 
 export const updateUser = async (req, res) => {
 
-    const { _id, accountType, gender, phoneNumber, address, bankAccount, interests, following, followers, clients, experience } = req.body;
+    const { _id, accountType, gender, phoneNumber, address, bankAccount, interests, following, followers, clients, experience, manager } = req.body;
 
     const updatedUser = new userData({
         _id : _id,
@@ -157,7 +189,8 @@ export const updateUser = async (req, res) => {
         bankAccount : bankAccount,
         interests : interests,
         following : following,
-        followers : followers
+        followers : followers,
+        manager : manager
     });
 
     const updatedManager = new managerData({
@@ -234,6 +267,53 @@ export const updateFollowing = async (req, res) => {
         });
 };
 
+export const updateTrader = async (req, res) => {
+    const { _id } = req.body;
+    const traderId = req.params.id;
+
+    const user = await userData.findById(traderId);
+    const updatedTrader = userData.updateOne(
+        { _id : traderId }, { manager : _id }, { new : true }, (err, result) => {
+            if(result) {
+                userData.findOne({ _id : traderId }).exec((error, usr) => {
+                    if(error) {
+                        return res.status(400).json({message: "Oops! something went wrong!"});
+                    }
+                    else {
+                        res.status(200).json({result: usr});
+                    }
+                })
+            }
+            else {
+                res.status(404).json({message: "User update failed"});
+            }
+        }
+    )
+};
+
+export const removeTrader = async (req, res) => {
+    const { _id } = req.body;
+    const traderId = req.params.id;
+
+    const user = await userData.findById(traderId);
+    const updatedTrader = userData.updateOne(
+        {_id : traderId}, { manager : null }, {new : true}, (err, result) => {
+            if(result) {
+                userData.findOne({_id : traderId}).exec((error, usr) => {
+                    if (error) {
+                        return res.status(400).json({message: "Oops! something went wrong!"});
+                    }
+                    else {
+                        res.status(200).json({result: usr});
+                    }
+                })
+            }
+            else {
+                res.status(404).json({message: "User update failed"});
+            }
+        });
+};
+
 export const removeFollowing = async (req, res) => {
     const { _id } = req.body;
     const myId = req.params.id;
@@ -280,6 +360,52 @@ export const updateFollower = async (req, res) => {
         });
 };
 
+export const updateManager = async (req, res) => {
+    const { _id } = req.body;
+    const managerId = req.params.id;
+
+    const manager = await managerData.findById(managerId);
+    const updatedManager = managerData.updateOne(
+        {_id : managerId}, { clients : [ ...manager.clients , _id ] }, {new : true}, (err, result) => {
+            if(result) {
+                managerData.findOne({ _id : managerId }).exec((error, usr) => {
+                    if (error) {
+                        return res.status(400).json({message: "Oops! something went wrong!"});
+                    }
+                    else {
+                        res.status(200);
+                    }
+                })
+            }
+            else {
+                res.status(404).json({message: "Manager clients update failed"});
+            }
+        });
+};
+
+export const removeManager = async (req, res) => {
+    const { _id } = req.body;
+    const managerId = req.params.id;
+
+    const manager = await managerData.findById(managerId);
+    const updatedManager = managerData.updateOne(
+        {_id : managerId}, { clients : manager.clients.filter(f => f !== _id) }, {new : true}, (err, result) => {
+            if(result) {
+                managerData.findOne({ _id : managerId }).exec((error, usr) => {
+                    if (error) {
+                        return res.status(400).json({message: "Oops! something went wrong!"});
+                    }
+                    else {
+                        res.status(200);
+                    }
+                })
+            }
+            else {
+                res.status(404).json({message: "Manager clients update failed"});
+            }
+        });
+}
+
 export const removeFollower = async (req, res) => {
     const { _id } = req.body;
     const otherId = req.params.id;
@@ -318,7 +444,7 @@ export const deleteUser = async (req, res) => {
                 }
             })
         }
-        else {
+        else if(account === "manager") {
             await managerData.deleteOne({ _id }).exec((error, result) => {
                 if(error) {
                     return res.status(400).json({message: "Oops! something went wrong!"});
